@@ -32,19 +32,24 @@ for f in *${extin}; do
 	echo "=suffix: "$suffix
 	echo "=filename: "$filename
 	echo "=strip_nums: "$strip_nums
+exifname="$rename_base""$(exiftool -d "%Y%m%d_%H%M%S" -CreateDate "$f" | awk '{print $4}')"
+modifname="$rename_base""$(date -r "$f" +"%Y%m%d_%H%M%S")"
+
 if [[ $1 == 'test' ]]
 then
-	echo "=EXIF : ""$rename_base""$(exiftool -d "%Y%m%d_%H%M%S" -CreateDate "$f" | awk '{print $4}')"".$suffix"
-echo "=MODIF: ""$rename_base""$(date -r "$f" +"%Y%m%d_%H%M%S")"".$suffix"
+	echo "=EXIF : "$exifname".$suffix"
+	echo "=MODIF: ""$rename_base""$(date -r "$f" +"%Y%m%d_%H%M%S")"".$suffix"
 else
-#	echo "FOR REALZIES"
-{mv -n "$f" "$rename_base""$(exiftool -d "%Y%m%d_%H%M%S" -CreateDate "$f" | awk '{print $4}')"".$suffix"} || {echo "$rename_base""$(date -r "$f" +"%Y%m%d_%H%M%S")"".$suffix"}
+	#	echo "FOR REALZIES"
+	#{
+	mv -n "$f" "$rename_base""$(exiftool -d "%Y%m%d_%H%M%S" -CreateDate "$f" | awk '{print $4}')"".$suffix"
+	#} || {echo "$rename_base""$(date -r "$f" +"%Y%m%d_%H%M%S")"".$suffix"}
 fi
 
 #rename other files with same name
 for g in $filename.*; do 
     ext="${g##*.}" 
-    mv "$g" "$rename_base""$(exiftool -d "%Y%m%d_%H%M%S" -CreateDate "$f" | awk '{print $4}')"".$suffix"
+    mv "$g" $exifname".$ext"
 done
 
 done
